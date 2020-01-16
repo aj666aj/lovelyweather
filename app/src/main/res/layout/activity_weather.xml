@@ -33,7 +33,7 @@
                 <include layout="@layout/info"/>
 
                 <include layout="@layout/suggestion"/>
-                
+
             </LinearLayout>
 
         </ScrollView>

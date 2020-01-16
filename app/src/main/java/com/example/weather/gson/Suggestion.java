@@ -8,4 +8,9 @@ public class Suggestion {
 
     public String txt;
 
+    public Suggestion(String type, String brf, String txt) {
+        this.type = type;
+        this.brf = brf;
+        this.txt = txt;
+    }
 }

@@ -7,4 +7,7 @@ public class Update {
     @SerializedName("loc")
     public String updateTime;
 
+    public Update(String updateTime) {
+        this.updateTime = updateTime;
+    }
 }

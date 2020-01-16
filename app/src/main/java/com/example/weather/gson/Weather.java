@@ -20,4 +20,12 @@ public class Weather {
     @SerializedName("daily_forecast")
     public List<Forecast> forecasts;
 
+    public Weather(String status, Basic basic, Update update, Now now, List<Suggestion> suggestions, List<Forecast> forecasts) {
+        this.status = status;
+        this.basic = basic;
+        this.update = update;
+        this.now = now;
+        this.suggestions = suggestions;
+        this.forecasts = forecasts;
+    }
 }

@@ -16,4 +16,10 @@ public class Basic {
     @SerializedName("lat")
     public String latitude;
 
+    public Basic(String cityName, String weather_id, String longitude, String latitude) {
+        this.cityName = cityName;
+        this.weather_id = weather_id;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
 }
