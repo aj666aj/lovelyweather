@@ -12,6 +12,8 @@ public class Weather {
 
     public Update update;
 
+    public Now now;
+
     @SerializedName("lifestyle")
     public List<Suggestion> suggestions;
 
