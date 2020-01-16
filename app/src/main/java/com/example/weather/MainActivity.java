@@ -10,6 +10,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,7 +21,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        Log.d("MainActivity", "onCreate: 123465");
         if (prefs.getString("weather", null) != null){
+//            Log.d("MainActivity", "onCreate: 123465");
             Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
             finish();

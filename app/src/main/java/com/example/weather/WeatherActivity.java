@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -110,7 +111,7 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WeatherActivity.this, "获取当前天气信息失败1", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -122,12 +123,12 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (now != null && now.status.equals("OK")){
+                        if (now != null && now.status.equals("ok")){
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("now", responseText);
                             editor.apply();
                         }else{
-                            Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WeatherActivity.this,"获取当前天气信息失败2",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -141,7 +142,7 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WeatherActivity.this, "获取建议信息失败1", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -158,7 +159,7 @@ public class WeatherActivity extends AppCompatActivity {
                             editor.putString("suggestions", responseText);
                             editor.apply();
                         }else{
-                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WeatherActivity.this, "获取建议信息失败2", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -172,7 +173,7 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WeatherActivity.this, "获取未来天气信息失败1", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -190,12 +191,14 @@ public class WeatherActivity extends AppCompatActivity {
                         List<Suggestion> suggestions = Utility.handleSuggestionResponse(suggestionStr);
                         if (now != null && suggestions != null){
                             Weather weather = Utility.handleWeatherResponse(responseText, now, suggestions);
-                            if (weather != null && weather.status.equals("OK")){
+                            if (weather != null && weather.status.equals("ok")){
                                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                                 editor.putString("weather", responseText);
                                 editor.apply();
                                 showWeatherInfo(weather);
                             }
+                        }else{
+                            Toast.makeText(WeatherActivity.this, "获取未来天气信息失败2", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

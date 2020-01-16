@@ -1,7 +1,7 @@
 package com.example.weather.util;
 
-import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.weather.db.City;
 import com.example.weather.db.County;
@@ -13,6 +13,8 @@ import com.example.weather.gson.Suggestion;
 import com.example.weather.gson.Update;
 import com.example.weather.gson.Weather;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Utility {
 
@@ -86,7 +89,16 @@ public class Utility {
 
     public static Now handleNowWeatherResponse(String response){
         try{
-            return new Gson().fromJson(response,Now.class);
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+            String status = jsonArray.getJSONObject(0).getString("status");
+            JSONObject nowObject = jsonArray.getJSONObject(0).getJSONObject("now");
+            String wind_dir = nowObject.getString("wind_dir");
+            String pres = nowObject.getString("pres");
+            String temperature = nowObject.getString("tmp");
+            String info = nowObject.getString("cond_txt");
+            Now now = new Now(status,wind_dir,pres,temperature,info);
+            return now;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -96,7 +108,9 @@ public class Utility {
     public static List<Suggestion> handleSuggestionResponse(String response){
         try{
             JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("lifestyle");
+            JSONArray middleArray = jsonObject.getJSONArray("HeWeather6");
+            JSONObject middleObject = middleArray.getJSONObject(0);
+            JSONArray jsonArray = middleObject.getJSONArray("lifestyle");
             List<Suggestion> suggestions = new ArrayList<>();
             for (int i = 0 ; i < jsonArray.length();i++){
                 JSONObject suggestion = jsonArray.getJSONObject(i);
@@ -115,10 +129,12 @@ public class Utility {
     public static Weather handleWeatherResponse(String response, Now now, List<Suggestion> suggestions){
         try{
             JSONObject jsonObject = new JSONObject(response);
-            JSONObject basicStr = jsonObject.getJSONObject("basic");
-            JSONObject updateStr = jsonObject.getJSONObject("update");
-            JSONArray forecastStr = jsonObject.getJSONArray("daily_forecast");
-            String status = jsonObject.getString("status");
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+            JSONObject weatherObject = jsonArray.getJSONObject(0);
+            JSONObject basicStr = weatherObject.getJSONObject("basic");
+            JSONObject updateStr = weatherObject.getJSONObject("update");
+            JSONArray forecastStr = weatherObject.getJSONArray("daily_forecast");
+            String status = weatherObject.getString("status");
             Basic basic = new Basic(basicStr.getString("location"),basicStr.getString("cid"),basicStr.getString("lon"),basicStr.getString("lat"));
             Update update = new Update(updateStr.getString("loc"));
             List<Forecast> forecasts = new ArrayList<>();
