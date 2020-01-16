@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.weather.gson.Forecast;
 import com.example.weather.gson.Now;
 import com.example.weather.gson.Suggestion;
 import com.example.weather.gson.Weather;
@@ -71,9 +73,13 @@ public class WeatherActivity extends AppCompatActivity {
         airText = findViewById(R.id.pres_txt);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String nowStr = prefs.getString("now",null);
+        String suggestionStr = prefs.getString("suggestions",null);
         String weatherString = prefs.getString("weather",null);
-        if (weatherString != null){
-            Weather weather = Utility.handleWeatherResponse(weatherString);
+        if (nowStr != null && suggestionStr != null && weatherString != null){
+            Now now = Utility.handleNowWeatherResponse(nowStr);
+            List<Suggestion> suggestions = Utility.handleSuggestionResponse(suggestionStr);
+            Weather weather = Utility.handleWeatherResponse(weatherString, now, suggestions);
             showWeatherInfo(weather);
         }else{
             String weatherId = getIntent().getStringExtra("weather_id");
@@ -128,8 +134,109 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
 
-        
+        HttpUtil.sendOkHttpRequest(lifeStyleUrl, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responseText = response.body().string();
+                final List<Suggestion> suggestions = Utility.handleSuggestionResponse(responseText);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (suggestions != null){
+                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                            editor.putString("suggestions", responseText);
+                            editor.apply();
+                        }else{
+                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+
+        HttpUtil.sendOkHttpRequest(foreCastUrl, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responseText = response.body().string();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
+                        String nowStr = prefs.getString("now",null);
+                        String suggestionStr = prefs.getString("suggestions",null);
+                        Now now = Utility.handleNowWeatherResponse(nowStr);
+                        List<Suggestion> suggestions = Utility.handleSuggestionResponse(suggestionStr);
+                        if (now != null && suggestions != null){
+                            Weather weather = Utility.handleWeatherResponse(responseText, now, suggestions);
+                            if (weather != null && weather.status.equals("OK")){
+                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                                editor.putString("weather", responseText);
+                                editor.apply();
+                                showWeatherInfo(weather);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void showWeatherInfo(Weather weather){
+        String cityName = weather.basic.cityName;
+        String updateTime = weather.update.updateTime.split(" ")[1];
+        String degree = weather.now.temperature + "℃";
+        String weatherInfo = weather.now.info;
+        titleCity.setText(cityName);
+        titleUpdateTime.setText(updateTime);
+        degreeText.setText(degree);
+        weatherInfoText.setText(weatherInfo);
+        forecastLayout.removeAllViews();
+        for(Forecast forecast : weather.forecasts){
+            View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
+            TextView dateText = view.findViewById(R.id.date_text);
+            TextView infoText = view.findViewById(R.id.info_text);
+            TextView maxText = view.findViewById(R.id.max_text);
+            TextView minText = view.findViewById(R.id.min_text);
+            dateText.setText(forecast.date);
+            infoText.setText(forecast.cond_txt_d);
+            maxText.setText(forecast.tmp_max);
+            minText.setText(forecast.tmp_min);
+            forecastLayout.addView(view);
+        }
+        windDirText.setText(weather.now.wind_dir);
+        presText.setText(weather.now.pres);
+        for (Suggestion suggestion : weather.suggestions){
+            if(suggestion.type.equals("drsg")){
+                drsgText.setText("穿着建议：" + suggestion.txt);
+            }else if (suggestion.type.equals("flu")){
+                fluText.setText("感冒指数：" + suggestion.txt);
+            }else if (suggestion.type.equals("air")){
+                airText.setText("空气质量：" + suggestion.txt);
+            }
+        }
+        weatherLayout.setVisibility(View.VISIBLE);
     }
 
 }

@@ -6,6 +6,10 @@ public class Now {
 
     public String status;
 
+    public String wind_dir;
+
+    public String pres;
+
     @SerializedName("tmp")
     public String temperature;
 
