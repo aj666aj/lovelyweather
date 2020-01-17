@@ -85,22 +85,21 @@ public class WeatherActivity extends AppCompatActivity {
         }else{
             String weatherId = getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
+            requestNowWeather(weatherId);
+            requestSuggestions(weatherId);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             requestWeather(weatherId);
         }
 
     }
 
-    public void requestWeather(final String weatherId){
+    public void requestNowWeather(final String weatherId){
 
         String nowWeatherUrl = "https://free-api.heweather.net/s6/weather/now?location=" +
-                weatherId +
-                "&key=c8ea3381257e4754b22eda92c2503c18";
-
-        String lifeStyleUrl = "https://free-api.heweather.net/s6/weather/lifestyle?location=" +
-                weatherId +
-                "&key=c8ea3381257e4754b22eda92c2503c18";
-
-        String foreCastUrl = "https://free-api.heweather.net/s6/weather/forecast?location=" +
                 weatherId +
                 "&key=c8ea3381257e4754b22eda92c2503c18";
 
@@ -117,13 +116,12 @@ public class WeatherActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, final Response response) throws IOException {
                 final String responseText = response.body().string();
-                final Now now = Utility.handleNowWeatherResponse(responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (now != null && now.status.equals("ok")){
+                        if (responseText != null){
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("now", responseText);
                             editor.apply();
@@ -134,6 +132,13 @@ public class WeatherActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    public void requestSuggestions(String weatherId){
+
+        String lifeStyleUrl = "https://free-api.heweather.net/s6/weather/lifestyle?location=" +
+                weatherId +
+                "&key=c8ea3381257e4754b22eda92c2503c18";
 
         HttpUtil.sendOkHttpRequest(lifeStyleUrl, new Callback() {
             @Override
@@ -150,11 +155,10 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
-                final List<Suggestion> suggestions = Utility.handleSuggestionResponse(responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (suggestions != null){
+                        if (responseText != null){
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("suggestions", responseText);
                             editor.apply();
@@ -165,6 +169,14 @@ public class WeatherActivity extends AppCompatActivity {
                 });
             }
         });
+
+    }
+
+    public void requestWeather(final String weatherId){
+
+        String foreCastUrl = "https://free-api.heweather.net/s6/weather/forecast?location=" +
+                weatherId +
+                "&key=c8ea3381257e4754b22eda92c2503c18";
 
         HttpUtil.sendOkHttpRequest(foreCastUrl, new Callback() {
             @Override
