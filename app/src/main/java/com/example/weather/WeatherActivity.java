@@ -224,8 +224,8 @@ public class WeatherActivity extends AppCompatActivity {
             TextView minText = view.findViewById(R.id.min_text);
             dateText.setText(forecast.date);
             infoText.setText(forecast.cond_txt_d);
-            maxText.setText(forecast.tmp_max);
-            minText.setText(forecast.tmp_min);
+            maxText.setText(forecast.tmp_max + "℃");
+            minText.setText(forecast.tmp_min + "℃");
             forecastLayout.addView(view);
         }
         windDirText.setText(weather.now.wind_dir);
