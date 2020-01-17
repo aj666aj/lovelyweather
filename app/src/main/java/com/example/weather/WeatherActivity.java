@@ -71,7 +71,7 @@ public class WeatherActivity extends AppCompatActivity {
         presText = findViewById(R.id.pres_txt);
         drsgText = findViewById(R.id.drsg_text);
         fluText = findViewById(R.id.flu_text);
-        airText = findViewById(R.id.pres_txt);
+        airText = findViewById(R.id.air_text);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String nowStr = prefs.getString("now",null);
