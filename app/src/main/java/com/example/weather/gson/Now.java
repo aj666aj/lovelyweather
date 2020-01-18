@@ -6,6 +6,8 @@ public class Now {
 
     public String status;
 
+    public String updateTime;
+
     public String wind_dir;
 
     public String pres;
@@ -14,8 +16,9 @@ public class Now {
 
     public String info;
 
-    public Now(String status, String wind_dir, String pres, String temperature, String info) {
+    public Now(String status, String updateTime, String wind_dir, String pres, String temperature, String info) {
         this.status = status;
+        this.updateTime = updateTime;
         this.wind_dir = wind_dir;
         this.pres = pres;
         this.temperature = temperature;
