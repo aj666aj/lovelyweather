@@ -120,6 +120,7 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                loadBingPic();
                 requestNowWeather(mWeatherId);
                 requestSuggestions(mWeatherId);
                 try {
@@ -263,7 +264,6 @@ public class WeatherActivity extends AppCompatActivity {
                 });
             }
         });
-        loadBingPic();
     }
 
     public void showWeatherInfo(Weather weather){
@@ -303,34 +303,35 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void loadBingPic(){
-//        final String requestBingPic = "http://182.92.217.213/bing_pic.html";
-//        Log.d("WeatherActivity", "onResponse: "+requestBingPic);
-//        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                final String bingPic = response.body().string();
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.d("WeatherActivity", "onResponse: "+bingPic);
-//                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-//                        editor.putString("bing_pic", bingPic);
-//                        editor.apply();
-//                        Glide.with(WeatherActivity.this).load(bingPic).into(bing_pic);
-//                    }
-//                });
-//            }
-//        });
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-        String url = "http://www.sinaimg.cn/dy/slidenews/1_img/2011_15/426_11313_986007.jpg";
-        editor.putString("bing_pic", url);
-        editor.apply();
-        Glide.with(WeatherActivity.this).load(url).into(bing_pic);
+        final String requestBingPic = "http://182.92.217.213/bing_pic.html";
+        Log.d("WeatherActivity", "onResponse: "+requestBingPic);
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(WeatherActivity.this, "请求背景图片失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String bingPic = response.body().string();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("WeatherActivity", "onResponse: "+bingPic);
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                        editor.putString("bing_pic", bingPic);
+                        editor.apply();
+                        Glide.with(WeatherActivity.this).load(bingPic).into(bing_pic);
+                    }
+                });
+            }
+        });
     }
 
 }
